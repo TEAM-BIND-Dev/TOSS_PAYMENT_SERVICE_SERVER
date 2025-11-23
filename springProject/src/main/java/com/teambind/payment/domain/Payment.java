@@ -15,48 +15,62 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Payment {
 
+    // 결제 ID (기본키)
     @Id
     @Column(name = "payment_id", length = 50)
     private String paymentId;
 
+    // 예약 ID
     @Column(name = "reservation_id", nullable = false, length = 50)
     private String reservationId;
 
+    // 결제 금액
     @Embedded
     private Money amount;
 
+    // 결제 수단 (카드, 가상계좌, 간편결제)
     @Enumerated(EnumType.STRING)
     @Column(name = "method", length = 20)
     private PaymentMethod method;
 
+    // 결제 상태 (준비, 완료, 실패, 취소)
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private PaymentStatus status;
 
+    // 주문 ID (클라이언트로부터 받은 값)
     @Column(name = "order_id", length = 100)
     private String orderId;
 
+    // 결제 키 (토스로부터 받은 고유 식별자)
     @Column(name = "payment_key", length = 200)
     private String paymentKey;
 
+    // 거래 ID (토스 결제 승인 후 받은 거래 번호)
     @Column(name = "transaction_id", length = 100)
     private String transactionId;
 
+    // 체크인 날짜 (환불 가능 여부 판단 기준)
     @Column(name = "check_in_date", nullable = false)
     private LocalDateTime checkInDate;
 
+    // 멱등성 키 (중복 결제 방지)
     @Column(name = "idempotency_key", length = 100, unique = true)
     private String idempotencyKey;
 
+    // 결제 생성 시각
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    // 결제 완료 시각
     @Column(name = "paid_at")
     private LocalDateTime paidAt;
 
+    // 결제 취소 시각
     @Column(name = "cancelled_at")
     private LocalDateTime cancelledAt;
 
+    // 결제 실패 사유
     @Column(name = "failure_reason", columnDefinition = "TEXT")
     private String failureReason;
 

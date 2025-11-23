@@ -14,34 +14,43 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PaymentEvent {
 
+    // 이벤트 ID (기본키, 자동 증가)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "event_id")
     private Long eventId;
 
+    // 집합 루트 ID (결제 ID 또는 환불 ID)
     @Column(name = "aggregate_id", nullable = false, length = 50)
     private String aggregateId;
 
+    // 이벤트 타입 (결제 완료, 결제 취소, 환불 완료)
     @Enumerated(EnumType.STRING)
     @Column(name = "event_type", nullable = false, length = 50)
     private EventType eventType;
 
+    // 이벤트 페이로드 (JSON 형식)
     @Column(name = "payload", nullable = false, columnDefinition = "TEXT")
     private String payload;
 
+    // 이벤트 상태 (대기, 발행 완료, 실패)
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private EventStatus status;
 
+    // 이벤트 생성 시각
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    // Kafka 발행 완료 시각
     @Column(name = "published_at")
     private LocalDateTime publishedAt;
 
+    // 재시도 횟수
     @Column(name = "retry_count", nullable = false)
     private Integer retryCount;
 
+    // 발행 실패 에러 메시지
     @Column(name = "error_message", columnDefinition = "TEXT")
     private String errorMessage;
 

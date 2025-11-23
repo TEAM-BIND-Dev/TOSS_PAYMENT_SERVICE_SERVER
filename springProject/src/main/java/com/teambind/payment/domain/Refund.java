@@ -15,13 +15,16 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Refund {
 
+    // 환불 ID (기본키)
     @Id
     @Column(name = "refund_id", length = 50)
     private String refundId;
 
+    // 결제 ID (환불 대상 결제)
     @Column(name = "payment_id", nullable = false, length = 50)
     private String paymentId;
 
+    // 환불 금액 (정책에 따라 계산된 실제 환불 금액)
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "value", column = @Column(name = "refund_amount")),
@@ -29,6 +32,7 @@ public class Refund {
     })
     private Money refundAmount;
 
+    // 원래 결제 금액
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "value", column = @Column(name = "original_amount")),
@@ -36,28 +40,36 @@ public class Refund {
     })
     private Money originalAmount;
 
+    // 환불 상태 (대기, 승인, 완료, 실패)
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private RefundStatus status;
 
+    // 환불 요청 사유
     @Column(name = "reason", columnDefinition = "TEXT")
     private String reason;
 
+    // 환불 취소 사유
     @Column(name = "cancel_reason", columnDefinition = "TEXT")
     private String cancelReason;
 
+    // 거래 ID (토스 환불 승인 후 받은 거래 번호)
     @Column(name = "transaction_id", length = 100)
     private String transactionId;
 
+    // 환불 요청 시각
     @Column(name = "requested_at", nullable = false)
     private LocalDateTime requestedAt;
 
+    // 환불 승인 시각
     @Column(name = "approved_at")
     private LocalDateTime approvedAt;
 
+    // 환불 완료 시각
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
+    // 환불 실패 사유
     @Column(name = "failure_reason", columnDefinition = "TEXT")
     private String failureReason;
 
