@@ -32,6 +32,9 @@ class PaymentConfirmServiceTest {
     @Mock
     private TossPaymentClient tossPaymentClient;
 
+    @Mock
+    private PaymentEventPublisher paymentEventPublisher;
+
     @InjectMocks
     private PaymentConfirmService paymentConfirmService;
 

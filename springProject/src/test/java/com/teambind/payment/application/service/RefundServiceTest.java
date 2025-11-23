@@ -33,6 +33,9 @@ class RefundServiceTest {
     @Mock
     private TossRefundClient tossRefundClient;
 
+    @Mock
+    private PaymentEventPublisher paymentEventPublisher;
+
     @InjectMocks
     private RefundService refundService;
 

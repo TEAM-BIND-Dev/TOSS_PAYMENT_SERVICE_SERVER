@@ -1,5 +1,7 @@
 package com.teambind.payment.application.service;
 
+import com.teambind.payment.adapter.out.kafka.dto.PaymentCancelledEvent;
+import com.teambind.payment.adapter.out.kafka.dto.RefundCompletedEvent;
 import com.teambind.payment.adapter.out.toss.dto.TossRefundRequest;
 import com.teambind.payment.adapter.out.toss.dto.TossRefundResponse;
 import com.teambind.payment.application.port.out.PaymentRepository;
@@ -24,6 +26,7 @@ public class RefundService {
     private final PaymentRepository paymentRepository;
     private final RefundRepository refundRepository;
     private final TossRefundClient tossRefundClient;
+    private final PaymentEventPublisher paymentEventPublisher;
 
     @Transactional
     public Refund processRefund(String paymentId, String reason) {
@@ -67,6 +70,14 @@ public class RefundService {
 
             log.info("환불 처리 완료 - refundId: {}, transactionId: {}, refundAmount: {}",
                     completedRefund.getRefundId(), completedRefund.getTransactionId(), refundAmount);
+
+            // 7. 환불 완료 이벤트 발행
+            RefundCompletedEvent refundEvent = RefundCompletedEvent.from(completedRefund);
+            paymentEventPublisher.publishRefundCompletedEvent(refundEvent);
+
+            // 8. 결제 취소 이벤트 발행
+            PaymentCancelledEvent cancelledEvent = PaymentCancelledEvent.from(payment);
+            paymentEventPublisher.publishPaymentCancelledEvent(cancelledEvent);
 
             return completedRefund;
 

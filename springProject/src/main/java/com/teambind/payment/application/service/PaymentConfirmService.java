@@ -1,5 +1,6 @@
 package com.teambind.payment.application.service;
 
+import com.teambind.payment.adapter.out.kafka.dto.PaymentCompletedEvent;
 import com.teambind.payment.adapter.out.toss.dto.TossPaymentConfirmRequest;
 import com.teambind.payment.adapter.out.toss.dto.TossPaymentConfirmResponse;
 import com.teambind.payment.application.port.out.PaymentRepository;
@@ -19,6 +20,7 @@ public class PaymentConfirmService {
 
     private final PaymentRepository paymentRepository;
     private final TossPaymentClient tossPaymentClient;
+    private final PaymentEventPublisher paymentEventPublisher;
 
     @Transactional
     public Payment confirmPayment(String paymentId, String orderId, String paymentKey, Long amount) {
@@ -48,6 +50,10 @@ public class PaymentConfirmService {
         Payment savedPayment = paymentRepository.save(payment);
         log.info("결제 승인 완료 - paymentId: {}, status: {}, method: {}",
                 savedPayment.getPaymentId(), savedPayment.getStatus(), savedPayment.getMethod());
+
+        // 6. 결제 완료 이벤트 발행
+        PaymentCompletedEvent event = PaymentCompletedEvent.from(savedPayment);
+        paymentEventPublisher.publishPaymentCompletedEvent(event);
 
         return savedPayment;
     }
