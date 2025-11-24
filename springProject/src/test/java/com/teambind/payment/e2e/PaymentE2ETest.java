@@ -43,13 +43,11 @@ class PaymentE2ETest extends AbstractE2ETest {
         LocalDateTime checkInDate = LocalDateTime.now().plusDays(10);
 
         // Kafka 이벤트 발행 (예약 확정 이벤트)
-        String eventPayload = String.format("""
-                {
-                    "reservationId": "%s",
-                    "amount": %d,
-                    "checkInDate": "%s"
-                }
-                """, reservationId, amount, checkInDate);
+        Map<String, Object> eventPayload = Map.of(
+                "reservationId", reservationId,
+                "amount", amount,
+                "checkInDate", checkInDate.toString()
+        );
 
         kafkaTemplate.send("reservation-confirmed-test", eventPayload);
 
