@@ -51,7 +51,7 @@ class PaymentE2ETest extends AbstractE2ETest {
                 }
                 """, reservationId, amount, checkInDate);
 
-        kafkaTemplate.send("reservation-confirmed", eventPayload);
+        kafkaTemplate.send("reservation-confirmed-test", eventPayload);
 
         // When & Then 1: Payment PREPARED 상태로 저장 확인 (이벤트 컨슈머 처리 대기)
         await().atMost(10, TimeUnit.SECONDS)
