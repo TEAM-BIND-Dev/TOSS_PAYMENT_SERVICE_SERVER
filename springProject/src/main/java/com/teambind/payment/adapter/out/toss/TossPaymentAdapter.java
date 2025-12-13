@@ -46,7 +46,7 @@ public class TossPaymentAdapter implements TossPaymentClient {
                     .block();
 
             log.info("토스 결제 승인 성공 - transactionId: {}, method: {}",
-                    response.transactionId(), response.method());
+                    response.lastTransactionKey(), response.method());
 
             return response;
 
