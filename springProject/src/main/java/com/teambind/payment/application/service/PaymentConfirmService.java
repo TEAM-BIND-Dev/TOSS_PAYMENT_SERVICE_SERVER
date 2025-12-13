@@ -46,7 +46,7 @@ public class PaymentConfirmService {
 
         // 4. 결제 완료 처리
         PaymentMethod method = PaymentMethod.valueOf(mapTossMethodToPaymentMethod(response.method()));
-        payment.complete(orderId, paymentKey, response.transactionId(), method);
+        payment.complete(orderId, paymentKey, response.lastTransactionKey(), method);
 
         // 5. 저장
         Payment savedPayment = paymentRepository.save(payment);
