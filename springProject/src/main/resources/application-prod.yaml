@@ -1,0 +1,74 @@
+spring:
+  application:
+    name: toss-payment-service
+
+  kafka:
+    bootstrap-servers: ${KAFKA_URL:kafka1:9091,kafka2:9092,kafka3:9093}
+
+    producer:
+      retries: 3
+      batch-size: 16384
+      buffer-memory: 33554432
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+    consumer:
+      group-id: payment-service-consumer-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+    listener:
+      ack-mode: record
+
+  datasource:
+    url: jdbc:mariadb://${DATABASE_HOST:toss-mariadb}:${DATABASE_PORT:3306}/payment_service?serverTimezone=Asia/Seoul&useUnicode=true&characterEncoding=utf8mb4
+    username: ${DATABASE_USER_NAME:tossuser}
+    password: ${DATABASE_PASSWORD:tosspass123}
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.MariaDBDialect
+        jdbc:
+          time_zone: Asia/Seoul
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+        batch_versioned_data: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    baseline-version: 0
+
+toss:
+  payments:
+    api:
+      base-url: ${TOSS_API_BASE_URL:https://api.tosspayments.com}
+      secret-key: ${TOSS_API_SECRET_KEY}
+      timeout: 10000
+
+reservation:
+  service:
+    url: ${RESERVATION_SERVICE_URL:http://ye-yak-manager-service:8080}
+    timeout: 5000
+
+kafka:
+  topics:
+    reservation-confirmed: ${KAFKA_TOPICS_RESERVATION_CONFIRMED:complete-reservation-info}
+    payment-completed: ${KAFKA_TOPICS_PAYMENT_COMPLETED:payment-completed}
+    payment-cancelled: ${KAFKA_TOPICS_PAYMENT_CANCELLED:payment-cancelled}
+    refund-completed: ${KAFKA_TOPICS_REFUND_COMPLETED:refund-completed}
+
+logging:
+  level:
+    root: ${LOG_LEVEL:INFO}
+    com.teambind.payment: ${LOG_LEVEL:INFO}
+    org.hibernate.SQL: WARN
