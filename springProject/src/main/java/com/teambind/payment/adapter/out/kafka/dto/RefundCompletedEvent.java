@@ -14,6 +14,9 @@ public record RefundCompletedEvent(
         // 결제 ID
         String paymentId,
 
+        // 예약 ID
+        String reservationId,
+
         // 원래 결제 금액
         Long originalAmount,
 
@@ -28,10 +31,11 @@ public record RefundCompletedEvent(
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
         LocalDateTime completedAt
 ) {
-    public static RefundCompletedEvent from(Refund refund) {
+    public static RefundCompletedEvent from(Refund refund, String reservationId) {
         return new RefundCompletedEvent(
                 refund.getRefundId(),
                 refund.getPaymentId(),
+                reservationId,
                 refund.getOriginalAmount().getValue().longValue(),
                 refund.getRefundAmount().getValue().longValue(),
                 refund.getReason(),
