@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -54,7 +55,7 @@ class PaymentConfirmServiceTest {
                 100000L,
                 "CARD",
                 "DONE",
-                LocalDateTime.now()
+                OffsetDateTime.now()
         );
     }
 
