@@ -15,6 +15,7 @@ Toss Payments API와 통합하여 안전하고 신뢰성 있는 결제 프로세
 ### 서비스 책임
 
 **결제 서비스가 하는 것:**
+
 - Toss Payments API를 통한 결제/환불 처리
 - 결제 준비 (예약 이벤트 수신 시)
 - 클라이언트 금액 변조 방지 (사전 저장 금액과 비교)
@@ -22,6 +23,7 @@ Toss Payments API와 통합하여 안전하고 신뢰성 있는 결제 프로세
 - 결제/환불 결과 이벤트 발행 (Kafka)
 
 **결제 서비스가 하지 않는 것:**
+
 - 예약 정보 관리 (예약 서비스 책임)
 - 상품 정보 관리 (상품 서비스 책임)
 - 사용자 인증/인가 (인증 서비스 책임)
@@ -33,17 +35,18 @@ Toss Payments API와 통합하여 안전하고 신뢰성 있는 결제 프로세
 
 ### 핵심 기술
 
-| 분류 | 기술 | 버전 | 선택 이유 |
-|------|------|------|----------|
-| Language | Java | 21 LTS | Pattern Matching, Records, Sealed Classes, Virtual Threads |
-| Framework | Spring Boot | 3.5.7 | 생산성, 풍부한 생태계 |
-| Database | MariaDB | 11.x | 안정성, 트랜잭션 지원 |
-| Message Queue | Kafka | 3.6 | 이벤트 기반 아키텍처, At-least-once 전달 보장 |
-| Payment Gateway | Toss Payments | v1 | 국내 점유율 1위, 개발자 친화적 API |
+| 분류              | 기술            | 버전     | 선택 이유                                                      |
+|-----------------|---------------|--------|------------------------------------------------------------|
+| Language        | Java          | 21 LTS | Pattern Matching, Records, Sealed Classes, Virtual Threads |
+| Framework       | Spring Boot   | 3.5.7  | 생산성, 풍부한 생태계                                               |
+| Database        | MariaDB       | 11.x   | 안정성, 트랜잭션 지원                                               |
+| Message Queue   | Kafka         | 3.6    | 이벤트 기반 아키텍처, At-least-once 전달 보장                           |
+| Payment Gateway | Toss Payments | v1     | 국내 점유율 1위, 개발자 친화적 API                                     |
 
 ### Java 21 활용
 
 **Pattern Matching for switch**
+
 ```java
 return switch ((int) daysUntilCheckIn) {
     case int days when days >= 5 -> BigDecimal.valueOf(1.00);
@@ -53,6 +56,7 @@ return switch ((int) daysUntilCheckIn) {
 ```
 
 **Record Classes (DTO)**
+
 ```java
 public record PaymentConfirmRequest(
     String paymentKey,
@@ -72,6 +76,7 @@ public record PaymentConfirmRequest(
 ### 환불 정책
 
 **시간 기반 차등 환불율**
+
 - 5일 전 이상: 100% 환불
 - 4일 전: 70% 환불
 - 3일 전: 50% 환불
@@ -80,6 +85,7 @@ public record PaymentConfirmRequest(
 - 당일: 환불 불가
 
 **결제 후 10분 무료 취소**
+
 - 결제 완료 후 10분 이내 취소 시 수수료 면제 (100% 환불)
 
 ---
