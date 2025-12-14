@@ -1,8 +1,11 @@
 -- ShedLock table for distributed scheduler locking
-CREATE TABLE shedlock (
-    name VARCHAR(64) NOT NULL,
+CREATE TABLE shedlock
+(
+    name       VARCHAR(64)  NOT NULL,
     lock_until TIMESTAMP(3) NOT NULL,
-    locked_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    locked_by VARCHAR(255) NOT NULL,
+    locked_at  TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    locked_by  VARCHAR(255) NOT NULL,
     PRIMARY KEY (name)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
