@@ -7,11 +7,13 @@ Toss Payment Service는 결제 준비 요청을 **두 가지 경로**로 처리�
 ## 두 가지 경로
 
 ### 1. REST API 경로
+
 ```
 Frontend → POST /api/v1/payments → PaymentController → PaymentPrepareService → DB
 ```
 
 ### 2. Kafka Event 경로
+
 ```
 Reservation Service → Kafka Topic → ReservationEventConsumer → PaymentPrepareService → DB
 ```
@@ -106,11 +108,13 @@ API 요청 (T1)                      Kafka 이벤트 (T2)
 ## 성능 고려사항
 
 ### 일반적인 경우 (99%)
+
 - 한 경로만 사용
 - 단순 조회 또는 저장
 - 성능 영향 없음
 
 ### Race Condition 발생 시 (1%)
+
 - DB unique 제약 위반 감지
 - 재조회 1회 추가
 - 약간의 지연 발생 (무시할 수준)
@@ -124,16 +128,19 @@ log.warn("동시 요청 감지 - reservationId: {}. 기존 결제 정보 조회 
 ```
 
 이 로그가 자주 발생한다면:
+
 - API와 이벤트 처리 시간 조정 검토
 - 분산 락 도입 고려
 
 ## 테스트 전략
 
 ### 단위 테스트
+
 - 각 경로 독립적으로 테스트
 - Exception handling 테스트
 
 ### 통합 테스트
+
 - API 먼저 → 이벤트 나중
 - 이벤트 먼저 → API 나중
 - 동시 요청 시뮬레이션
@@ -143,6 +150,7 @@ log.warn("동시 요청 감지 - reservationId: {}. 기존 결제 정보 조회 
 Dual Path 아키텍처는 유연성과 안정성을 제공하지만, Race Condition을 적절히 처리해야 합니다.
 
 현재 구현은:
+
 - ✅ DB 제약조건으로 데이터 무결성 보장
 - ✅ Exception handling으로 사용자 경험 보장
 - ✅ 로깅으로 모니터링 지원
