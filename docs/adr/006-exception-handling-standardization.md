@@ -1,6 +1,7 @@
 # ADR-006: Exception Handling Standardization
 
 ## Status
+
 **Accepted** - 2025-11-23
 
 ## Context
@@ -130,21 +131,25 @@ public ResponseEntity<ErrorResponse> handleCustomException(
 ### 마이그레이션 전략
 
 #### Phase 1: ErrorCode 확장
+
 - 결제 도메인 에러 코드 추가 (PAYMENT_001~007)
 - 환불 도메인 에러 코드 추가 (REFUND_001~006)
 - Toss API 에러 코드 추가 (TOSS_001~003)
 
 #### Phase 2: 도메인 예외 클래스 생성
+
 - PaymentException with factory methods
 - RefundException with factory methods
 - TossApiException with factory methods
 
 #### Phase 3: 서비스 레이어 마이그레이션
+
 - PaymentConfirmService: IllegalArgumentException → PaymentException
 - RefundService: IllegalArgumentException, RuntimeException → PaymentException, RefundException
 - PaymentCancelService: RuntimeException → TossApiException
 
 #### Phase 4: 테스트 코드 업데이트
+
 - 예외 타입 검증 변경
 - 메시지 검증 변경 (한글 → 영문)
 
@@ -153,16 +158,16 @@ public ResponseEntity<ErrorResponse> handleCustomException(
 ### Positive
 
 1. **에러 분류 명확화**
-   - exceptionType을 통해 도메인/레이어별 에러 구분 가능
-   - 모니터링 및 로깅 개선
+	- exceptionType을 통해 도메인/레이어별 에러 구분 가능
+	- 모니터링 및 로깅 개선
 
 2. **일관된 에러 응답**
-   - 모든 API 엔드포인트에서 동일한 에러 응답 구조
-   - HTTP 상태 코드와 ErrorCode의 자동 매핑
+	- 모든 API 엔드포인트에서 동일한 에러 응답 구조
+	- HTTP 상태 코드와 ErrorCode의 자동 매핑
 
 3. **개발 생산성 향상**
-   - 팩토리 메서드로 예외 생성 간소화
-   - IDE 자동완성으로 사용 가능한 에러 쉽게 파악
+	- 팩토리 메서드로 예외 생성 간소화
+	- IDE 자동완성으로 사용 가능한 에러 쉽게 파악
 
 4. **테스트 명확성**
    ```java
@@ -178,44 +183,44 @@ public ResponseEntity<ErrorResponse> handleCustomException(
    ```
 
 5. **클라이언트 에러 처리 개선**
-   - 에러 코드 기반 처리 가능
-   - i18n 대응 가능 (코드로 메시지 매핑)
+	- 에러 코드 기반 처리 가능
+	- i18n 대응 가능 (코드로 메시지 매핑)
 
 6. **디버깅 용이성**
-   - 스택 트레이스에서 명확한 예외 타입
-   - 원인 예외(cause) 추적 가능
+	- 스택 트레이스에서 명확한 예외 타입
+	- 원인 예외(cause) 추적 가능
 
 ### Negative
 
 1. **초기 구현 비용**
-   - ErrorCode 확장
-   - 예외 클래스 생성
-   - 기존 코드 마이그레이션
-   - 테스트 코드 수정
+	- ErrorCode 확장
+	- 예외 클래스 생성
+	- 기존 코드 마이그레이션
+	- 테스트 코드 수정
 
 2. **예외 클래스 증가**
-   - 도메인/레이어별 예외 클래스 필요
-   - 유지보수 포인트 증가
+	- 도메인/레이어별 예외 클래스 필요
+	- 유지보수 포인트 증가
 
 3. **학습 곡선**
-   - 신규 개발자가 예외 체계 이해 필요
-   - 팩토리 메서드 사용법 학습
+	- 신규 개발자가 예외 체계 이해 필요
+	- 팩토리 메서드 사용법 학습
 
 ### Mitigation
 
 1. **명확한 문서화**
-   - [EXCEPTION_HANDLING.md](../implementation/EXCEPTION_HANDLING.md) 작성
-   - 팩토리 메서드 사용 예시 제공
-   - 에러 코드 네이밍 규칙 정립
+	- [EXCEPTION_HANDLING.md](../implementation/EXCEPTION_HANDLING.md) 작성
+	- 팩토리 메서드 사용 예시 제공
+	- 에러 코드 네이밍 규칙 정립
 
 2. **점진적 마이그레이션**
-   - 신규 기능부터 적용
-   - 기존 코드는 우선순위에 따라 마이그레이션
+	- 신규 기능부터 적용
+	- 기존 코드는 우선순위에 따라 마이그레이션
 
 3. **코드 리뷰 체크리스트**
-   - 일반 예외 사용 금지
-   - 팩토리 메서드 사용 권장
-   - 원인 예외 포함 확인
+	- 일반 예외 사용 금지
+	- 팩토리 메서드 사용 권장
+	- 원인 예외 포함 확인
 
 ## Implementation
 
@@ -224,6 +229,7 @@ public ResponseEntity<ErrorResponse> handleCustomException(
 #### PaymentConfirmService
 
 **Before**:
+
 ```java
 Payment payment = paymentRepository.findById(paymentId)
     .orElseThrow(() -> new IllegalArgumentException(
@@ -232,6 +238,7 @@ Payment payment = paymentRepository.findById(paymentId)
 ```
 
 **After**:
+
 ```java
 Payment payment = paymentRepository.findById(paymentId)
     .orElseThrow(() -> PaymentException.notFound(paymentId));
@@ -240,6 +247,7 @@ Payment payment = paymentRepository.findById(paymentId)
 #### RefundService
 
 **Before**:
+
 ```java
 } catch (Exception e) {
     log.error("환불 처리 실패", e);
@@ -250,6 +258,7 @@ Payment payment = paymentRepository.findById(paymentId)
 ```
 
 **After**:
+
 ```java
 } catch (Exception e) {
     log.error("환불 처리 실패 - paymentId: {}, error: {}",
@@ -267,6 +276,7 @@ Payment payment = paymentRepository.findById(paymentId)
 ### 에러 응답 예시
 
 **Before** (IllegalArgumentException):
+
 ```http
 HTTP/1.1 500 Internal Server Error
 Content-Type: application/json
@@ -281,6 +291,7 @@ Content-Type: application/json
 ```
 
 **After** (PaymentException):
+
 ```http
 HTTP/1.1 404 Not Found
 Content-Type: application/json
@@ -300,10 +311,12 @@ Content-Type: application/json
 ### Alternative 1: Spring의 기본 예외만 사용
 
 **장점**:
+
 - 추가 구현 불필요
 - Spring 표준 따름
 
 **단점**:
+
 - 도메인 에러 표현 어려움
 - 에러 코드 없음
 - HTTP 상태 코드 제어 어려움
@@ -313,10 +326,12 @@ Content-Type: application/json
 ### Alternative 2: ResponseEntity만으로 에러 처리
 
 **장점**:
+
 - 예외 없이 응답 객체로 처리
 - 명시적 제어
 
 **단점**:
+
 - 코드 복잡도 증가
 - 트랜잭션 롤백 처리 어려움
 - 예외의 장점 상실
@@ -326,9 +341,11 @@ Content-Type: application/json
 ### Alternative 3: 예외별로 별도 ErrorCode 없이 처리
 
 **장점**:
+
 - 구현 간소화
 
 **단점**:
+
 - 클라이언트에서 에러 식별 어려움
 - i18n 대응 불가
 - 에러 분석 어려움
